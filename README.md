@@ -48,4 +48,42 @@ Map(coordinateRegion: $mapRegion, annotationItems: locations) { location in
 }
 ```
 
+***Using Touch ID and Face ID with SwiftUI***
+
+First step is to add new key to our project. So go to Target/Info/Right_click_add_row/Privacy - Face ID Usage Description and give it the value, for example, "We need to unlock your data." When this is done, import LocalAuthentication.
+
+Next, we must write an authenticate() method that isolates all the biometric functionality in a single place.
+
+1. Create instance of LAContext, which allows us to query biometric status and perform the authentication check.
+2. Ask the context whether it's capable of performing biometric authentication - some devices likes iPod touch has neither Touch ID nor Face ID.
+3. If biometrics are possible, kick off actual request for authentication, passing in a closure to run when authentication completes.
+4. According to outcome, tell back whether it worked or not.
+```
+func authenticate() {
+    let context = LAContext()
+    var error: NSError?
+
+    // check whether biometric authentication is possible
+    if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
+        // it's possible, so go ahead and use it
+        let reason = "We need to unlock your data."
+
+        context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reason) { success, authenticationError in
+            // authentication has now completed
+            if success {
+                // authenticated successfully
+            } else {
+                // there was a problem
+            }
+        }
+    } else {
+        // no biometrics
+    }
+}
+```
+
+This function won't do anything so far, because it's not connected to SwiftUI. So, we must add property to store state and then change it according to the outcome of authentication.
+
+
+
 
